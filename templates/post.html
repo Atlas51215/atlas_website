@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{.Title}} - My Blog</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1><a href="/">My Blog</a></h1>
+    </header>
+    <main>
+        <article>
+            <h2>{{.Title}}</h2>
+            <time>{{.CreatedAt.Format "January 2, 2006"}}</time>
+            <div class="content">{{.Body}}</div>
+        </article>
+    </main>
+</body>
+</html>
