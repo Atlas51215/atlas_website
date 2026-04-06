@@ -162,7 +162,7 @@ Four user roles, from highest to lowest:
 
 The navbar is a left-side sidebar with the following structure (top to bottom):
 
-1. **Logo & Title** — The Atlas "A" logo followed by "tlas" text. The "A" is the custom logo (black, red, white). Favicon is the same logo.
+1. **Logo & Title** — The Atlas "A" logo followed by "tlas" text. The "A" is the custom logo: a stylized letter A shape with thick black outer strokes forming the legs and crossbar, and a solid red inner chevron/arrow pointing upward in the center, on a white background. The outer silhouette is a tall triangle with splayed legs. Favicon is the same logo. Source file: `LOGO.PNG`.
 2. **Hide/Show Button** — Always visible in the top-right corner of the viewport. Toggles sidebar visibility. On mobile, sidebar starts hidden.
 3. **Search Bar** — Text input, searches post titles first; if no matches, searches post bodies.
 4. **Nav Links** (with sub-category expansion):
@@ -416,8 +416,15 @@ templates/
 static/
   css/output.css                -- compiled Tailwind
   htmx.min.js                   -- single JS file
-  logo.svg                      -- Atlas "A" logo (to be added later)
-  favicon.ico                   -- favicon (same logo, to be added later)
+  logo.svg                      -- Atlas "A" logo (transparent bg, black + red paths, 639×615 viewBox)
+  logo.png                      -- Atlas "A" logo source (original PNG)
+  favicon.ico                   -- favicon (multi-size .ico)
+  favicon.svg                   -- SVG favicon
+  favicon-96x96.png             -- 96px PNG favicon
+  apple-touch-icon.png          -- iOS home screen icon
+  web-app-manifest-192x192.png  -- PWA icon 192px
+  web-app-manifest-512x512.png  -- PWA icon 512px
+  site.webmanifest              -- web app manifest
 
 uploads/                        -- user-uploaded images
 
