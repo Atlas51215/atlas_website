@@ -12,5 +12,6 @@ func NewRouter(staticDir string) http.Handler {
 	r.Use(middleware.Logger)
 	r.Get("/", Home)
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
+	r.Handle("/favicon.ico", http.FileServer(http.Dir(staticDir)))
 	return r
 }
