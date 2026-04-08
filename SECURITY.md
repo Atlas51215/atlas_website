@@ -2,20 +2,22 @@
 
 ## Supported Versions
 
-Use this section to tell people about which versions of your project are
-currently being supported with security updates.
+Only the latest version of Atlas is supported with security updates. Older versions do not receive patches.
 
-| Version | Supported          |
-| ------- | ------------------ |
-| 5.1.x   | :white_check_mark: |
-| 5.0.x   | :x:                |
-| 4.0.x   | :white_check_mark: |
-| < 4.0   | :x:                |
+| Version | Supported |
+| ------- | --------- |
+| latest  | yes       |
+| older   | no        |
 
 ## Reporting a Vulnerability
 
-Use this section to tell people how to report a vulnerability.
+Please do **not** open a public GitHub issue for security vulnerabilities.
 
-Tell them where to go, how often they can expect to get an update on a
-reported vulnerability, what to expect if the vulnerability is accepted or
-declined, etc.
+Report vulnerabilities by emailing [@Atlas51215](https://github.com/Atlas51215) directly or opening a [GitHub Security Advisory](https://github.com/Atlas51215/atlas_website/security/advisories/new) on this repository.
+
+Include as much detail as possible:
+- A description of the vulnerability
+- Steps to reproduce
+- Potential impact
+
+You can expect an acknowledgement within 48 hours. If the vulnerability is confirmed, a fix will be prioritized for the next release. You will be credited in the release notes unless you prefer otherwise.
