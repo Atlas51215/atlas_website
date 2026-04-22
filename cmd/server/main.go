@@ -16,5 +16,5 @@ func main() {
 	defer db.Close()
 
 	log.Println("Listening on http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", handler.NewRouter("static")))
+	log.Fatal(http.ListenAndServe(":8080", handler.NewRouter(db, "static")))
 }
