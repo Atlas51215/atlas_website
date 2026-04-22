@@ -27,4 +27,7 @@ go.work.sum
 .claude/*
 CLAUDE.md
 */CLAUDE.md
-open_claude.bat
+scripts/open_claude.bat
+
+# air hot-reload build output
+tmp/

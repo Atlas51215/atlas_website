@@ -1,49 +1,467 @@
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Plus+Jakarta+Sans:wght@500;600&display=swap');
+
+/* ================================================
+   CSS Variables — Dark mode default, light optional
+   ================================================ */
+
+:root {
+  --bg:            #000000;
+  --sidebar-bg:    #141414;
+  --surface:       #19191A;
+  --text:          #FAFAFA;
+  --text-muted:    #76757F;
+  --accent:        #dc2626;
+  --accent-hover:  #ef4444;
+  --border:        #323234;
+  --input-bg:      #19191A;
+  --input-border:  #323234;
+  --nav-hover:     #19191A;
+  --sidebar-width: 260px;
+
+  --font-ui:      'Inter', system-ui, sans-serif;
+  --font-heading: 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body:    Georgia, 'Times New Roman', serif;
+
+  --radius-pill:  120px;
+  --radius-card:  16px;
+  --radius-sm:    8px;
+  --radius-input: 5px;
+
+  --shadow-sm:    0 4px 8px rgba(0,0,0,0.08);
+  --shadow-deep:  12px 12px 50px rgba(0,0,0,0.4);
+
+  --transition:   0.4s ease;
+}
+
+html[data-theme="light"] {
+  --bg:            #F5F5F6;
+  --sidebar-bg:    #FAFAFA;
+  --surface:       #ffffff;
+  --text:          #19191A;
+  --text-muted:    #76757F;
+  --accent:        #dc2626;
+  --accent-hover:  #b91c1c;
+  --border:        #F5F5F6;
+  --input-bg:      #ffffff;
+  --input-border:  #76757F;
+  --nav-hover:     #F5F5F6;
+}
+
+/* ================================================
+   Reset & base
+   ================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  color-scheme: dark;
+  scrollbar-color: var(--border) var(--bg);
+  scrollbar-width: thin;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
 }
 
 body {
-    font-family: Georgia, "Times New Roman", serif;
-    line-height: 1.7;
-    color: #333;
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 2rem 1rem;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  line-height: 1.8;
+  min-height: 100vh;
 }
 
-header {
-    margin-bottom: 2rem;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 1rem;
+a {
+  color: var(--text);
+  text-decoration: none;
+  transition: color 0.18s ease;
 }
 
-header a {
-    color: inherit;
-    text-decoration: none;
+a:hover {
+  color: var(--accent);
 }
 
-article {
-    margin-bottom: 2rem;
+/* ================================================
+   Two-column layout
+   ================================================ */
+
+.layout {
+  display: flex;
+  min-height: 100vh;
 }
 
-article h2 a {
-    color: inherit;
-    text-decoration: none;
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  min-width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--sidebar-bg);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease, min-width 0.3s ease, border-color 0.3s ease;
+  z-index: 10;
 }
 
-article h2 a:hover {
-    text-decoration: underline;
+/* Main content: fixed max-width, centered in whatever space is left */
+.main-content {
+  flex: 0 1 720px;
+  min-width: 0;
+  padding: 3rem 2.5rem;
+  margin: 0 auto;
 }
 
-time {
-    display: block;
-    color: #888;
-    font-size: 0.9rem;
-    margin: 0.25rem 0 1rem;
+/* Sidebar hidden (desktop toggle) */
+html.sidebar-hidden .sidebar {
+  width: 0;
+  min-width: 0;
+  border-right-color: transparent;
 }
 
-.content p {
-    margin-bottom: 1rem;
+html.sidebar-hidden .sidebar .nav {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+/* ================================================
+   Sidebar toggle button
+   Fixed to top-right of viewport, always visible
+   ================================================ */
+
+.sidebar-toggle {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 200;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-sm);
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.sidebar-toggle:hover {
+  background: var(--nav-hover);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ================================================
+   Navigation (inside sidebar)
+   ================================================ */
+
+.nav {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 1.5rem 1.25rem 1.25rem;
+  gap: 2rem;
+  min-width: var(--sidebar-width);
+}
+
+/* --- Logo --- */
+.nav-logo a {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--text);
+}
+
+.nav-logo-img {
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.nav-logo-text {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  font-weight: bold;
+  letter-spacing: -0.02em;
+}
+
+/* --- Search --- */
+.nav-search input[type="search"] {
+  width: 100%;
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--text);
+  border-radius: var(--radius-input);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.9rem;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: border-color 0.18s ease;
+  appearance: none;
+}
+
+.nav-search input[type="search"]::placeholder {
+  color: var(--text-muted);
+}
+
+.nav-search input[type="search"]:focus {
+  border-color: var(--accent);
+}
+
+/* --- Top-level nav links --- */
+.nav-links {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  flex: 1;
+}
+
+.nav-links > li > a {
+  display: block;
+  padding: 0.45rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: var(--font-ui);
+  color: var(--text);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.nav-links > li > a:hover,
+.nav-links > li.active > a {
+  background: var(--nav-hover);
+  color: var(--accent);
+}
+
+/* --- Nav groups (Blog, Reviews) --- */
+.nav-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.5rem;
+}
+
+.nav-group-label {
+  display: block;
+  padding: 0.4rem 0.65rem 0.2rem;
+  font-size: 0.75rem;
+  font-family: var(--font-ui);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nav-group > ul {
+  list-style: none;
+  margin-left: 1rem;
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.nav-group > ul li a {
+  display: block;
+  padding: 0.3rem 0.5rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-family: var(--font-ui);
+  color: var(--text-muted);
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.nav-group > ul li a:hover,
+.nav-group > ul li.active a {
+  color: var(--accent);
+  background: var(--nav-hover);
+}
+
+/* --- Ad slot --- */
+.nav-ad {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+}
+
+/* ================================================
+   Main content typography
+   ================================================ */
+
+.main-content h1 {
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  line-height: 1.25;
+  margin-bottom: 1.25rem;
+}
+
+.main-content h2 {
+  font-family: var(--font-heading);
+  font-size: 1.65rem;
+  line-height: 1.3;
+  margin: 2rem 0 0.875rem;
+}
+
+.main-content h3 {
+  font-family: var(--font-heading);
+  font-size: 1.3rem;
+  margin: 1.5rem 0 0.625rem;
+}
+
+.main-content p {
+  margin-bottom: 1.125rem;
+}
+
+.main-content ul,
+.main-content ol {
+  margin: 0.75rem 0 1rem 1.5rem;
+}
+
+.main-content li {
+  margin-bottom: 0.3rem;
+}
+
+.main-content a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.main-content a:hover {
+  color: var(--accent-hover);
+}
+
+.main-content hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+.main-content code {
+  font-family: ui-monospace, "Cascadia Code", "Fira Code", monospace;
+  font-size: 0.88em;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 0.15em 0.4em;
+}
+
+.main-content pre {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  margin-bottom: 1rem;
+}
+
+.main-content pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 0.88rem;
+}
+
+/* ================================================
+   Buttons
+   ================================================ */
+
+.btn {
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 500;
+  line-height: 1.625;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  transition: background var(--transition), color var(--transition);
+  width: fit-content;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-radius: var(--radius-input);
+}
+
+.btn-primary:hover {
+  background: #000;
+  color: #fff;
+}
+
+.btn-pill {
+  border-radius: var(--radius-pill);
+}
+
+/* ================================================
+   Mobile — sidebar hidden by default, overlay when shown
+   ================================================ */
+
+@media (max-width: 768px) {
+  .sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 0;
+    min-width: 0;
+    border-right-color: transparent;
+  }
+
+  html.sidebar-visible .sidebar {
+    width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
+    border-right-color: var(--border);
+    box-shadow: var(--shadow-deep);
+  }
+
+  html.sidebar-visible .sidebar .nav {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Dim overlay behind sidebar on mobile */
+  html.sidebar-visible::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    z-index: 9;
+  }
+
+  .main-content {
+    padding: 1.5rem 1rem;
+  }
+
+  /* Undo the desktop sidebar-hidden rule on mobile */
+  html.sidebar-hidden .sidebar {
+    width: 0;
+    min-width: 0;
+  }
 }

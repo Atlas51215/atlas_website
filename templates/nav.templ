@@ -1,0 +1,76 @@
+package templates
+
+import (
+	"strings"
+
+	"github.com/claude/blog/internal/model"
+)
+
+templ Nav(cats []model.Category, currentPath string) {
+	<nav class="nav">
+		<div class="nav-logo">
+			<a href="/">
+				<img src="/static/logo.svg" alt="A" class="nav-logo-img"/>
+				<span class="nav-logo-text">tlas</span>
+			</a>
+		</div>
+		<div class="nav-search">
+			<input
+				type="search"
+				name="q"
+				placeholder="Search..."
+				hx-get="/search"
+				hx-target="#main-content"
+				hx-trigger="input changed delay:500ms"
+			/>
+		</div>
+		<ul class="nav-links">
+			<li class={ navItemClass(currentPath, "/") }>
+				<a href="/">Home</a>
+			</li>
+			<li class={ navItemClass(currentPath, "/about") }>
+				<a href="/about">About Me</a>
+			</li>
+			<li class="nav-group">
+				<span class="nav-group-label">Blog</span>
+				<ul>
+					for _, cat := range cats {
+						if cat.GroupName == "blog" {
+							<li class={ navItemClass(currentPath, "/blog/"+cat.Slug) }>
+								<a href={ templ.SafeURL("/blog/" + cat.Slug) }>{ cat.Name }</a>
+							</li>
+						}
+					}
+				</ul>
+			</li>
+			<li class="nav-group">
+				<span class="nav-group-label">Reviews</span>
+				<ul>
+					for _, cat := range cats {
+						if cat.GroupName == "reviews" {
+							<li class={ navItemClass(currentPath, "/reviews/"+cat.Slug) }>
+								<a href={ templ.SafeURL("/reviews/" + cat.Slug) }>{ cat.Name }</a>
+							</li>
+						}
+					}
+				</ul>
+			</li>
+		</ul>
+		<div class="nav-ad">
+			<!-- ad placeholder -->
+		</div>
+	</nav>
+}
+
+func navItemClass(currentPath, href string) string {
+	if href == "/" {
+		if currentPath == "/" {
+			return "active"
+		}
+		return ""
+	}
+	if strings.HasPrefix(currentPath, href) {
+		return "active"
+	}
+	return ""
+}

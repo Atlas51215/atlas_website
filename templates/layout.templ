@@ -1,0 +1,37 @@
+package templates
+
+import "github.com/claude/blog/internal/model"
+
+templ Layout(title string, cats []model.Category, currentPath string) {
+	<!DOCTYPE html>
+	<html lang="en" data-theme="dark">
+		<head>
+			<meta charset="UTF-8"/>
+			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+			<title>{ title } – Atlas</title>
+			<link rel="stylesheet" href="/static/style.css"/>
+			<script src="/static/htmx.min.js"></script>
+		</head>
+		<body>
+			<button
+				class="sidebar-toggle"
+				aria-label="Toggle sidebar"
+				onclick="
+					if (window.innerWidth <= 768) {
+						document.documentElement.classList.toggle('sidebar-visible');
+					} else {
+						document.documentElement.classList.toggle('sidebar-hidden');
+					}
+				"
+			>&#9776;</button>
+			<div class="layout">
+				<aside class="sidebar">
+					@Nav(cats, currentPath)
+				</aside>
+				<main id="main-content" class="main-content">
+					{ children... }
+				</main>
+			</div>
+		</body>
+	</html>
+}
