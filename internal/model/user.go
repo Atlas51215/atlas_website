@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 	"fmt"
@@ -9,6 +10,19 @@ import (
 
 	"golang.org/x/crypto/bcrypt"
 )
+
+type contextKey string
+
+const userContextKey contextKey = "user"
+
+func UserFromContext(ctx context.Context) *User {
+	u, _ := ctx.Value(userContextKey).(*User)
+	return u
+}
+
+func WithUser(ctx context.Context, u *User) context.Context {
+	return context.WithValue(ctx, userContextKey, u)
+}
 
 // Sentinel errors returned when a UNIQUE constraint is violated.
 var (

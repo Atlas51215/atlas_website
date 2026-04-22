@@ -2,8 +2,8 @@ package templates
 
 import "github.com/claude/blog/internal/model"
 
-templ Home(cats []model.Category) {
-	@Layout("Home", cats, "/") {
+templ Home(cats []model.Category, theme string) {
+	@Layout("Home", cats, "/", theme) {
 		<h1>Welcome to Atlas</h1>
 	}
 }
