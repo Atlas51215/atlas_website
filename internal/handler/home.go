@@ -18,6 +18,10 @@ func Home(db *sql.DB) http.HandlerFunc {
 			http.Error(w, "internal error", http.StatusInternalServerError)
 			return
 		}
-		render.Component(w, r, templates.Home(cats))
+		theme := "dark"
+		if u := model.UserFromContext(r.Context()); u != nil && u.Theme != "" {
+			theme = u.Theme
+		}
+		render.Component(w, r, templates.Home(cats, theme))
 	}
 }
