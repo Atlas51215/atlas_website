@@ -32,3 +32,4 @@ scripts/open_claude.bat
 # air hot-reload build output
 tmp/
 scripts/open_workspace.bat
+/docs/code_review
