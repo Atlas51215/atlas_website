@@ -1,0 +1,30 @@
+#!/bin/bash
+
+DIFF=$(git diff --staged)
+
+if [ -z "$DIFF" ]; then
+  exit 0
+fi
+
+echo "Running clean-code-reviewer..."
+
+# Ask Claude to generate a short snake_case title describing the changes
+TITLE=$(echo "$DIFF" | claude -p "Based on these staged changes, output a short snake_case filename (no extension, no spaces, underscores only, max 5 words) that describes what changed. Output ONLY the filename, nothing else.")
+TITLE=$(echo "$TITLE" | tr -d '[:space:]')
+
+if [ -z "$TITLE" ]; then
+  TITLE="review_$(date +%Y%m%d_%H%M%S)"
+fi
+
+REVIEW_FILE="docs/code_review/${TITLE}.md"
+mkdir -p docs/code_review
+
+echo "$DIFF" | claude --agent clean-code-reviewer -p "Review these staged changes. Be specific about file names and line numbers." > "$REVIEW_FILE"
+
+if [ $? -ne 0 ]; then
+  echo "Code review failed — commit blocked."
+  exit 1
+fi
+
+git add "$REVIEW_FILE"
+echo "Code review written to $REVIEW_FILE"
