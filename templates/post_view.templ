@@ -1,0 +1,58 @@
+package templates
+
+import (
+	"time"
+
+	"github.com/claude/blog/internal/model"
+	"github.com/claude/blog/templates/components"
+)
+
+type PostViewData struct {
+	Post         model.Post
+	Category     model.Category
+	RenderedBody string
+}
+
+func postViewDate(p model.Post) string {
+	if p.PublishedAt != nil {
+		return p.PublishedAt.Format("Jan 2, 2006")
+	}
+	return p.CreatedAt.Format(time.DateOnly)
+}
+
+func groupLabel(group string) string {
+	if group == "reviews" {
+		return "Reviews"
+	}
+	return "Blog"
+}
+
+templ PostView(cats []model.Category, theme string, currentPath string, d PostViewData) {
+	@Layout(d.Post.Title, cats, currentPath, theme) {
+		<nav class="breadcrumb" aria-label="Breadcrumb">
+			<a href={ templ.SafeURL("/" + d.Post.GroupName) }>{ groupLabel(d.Post.GroupName) }</a>
+			<span class="breadcrumb-sep">›</span>
+			<a href={ templ.SafeURL("/" + d.Post.GroupName + "/" + d.Category.Slug) }>{ d.Category.Name }</a>
+			<span class="breadcrumb-sep">›</span>
+			<span aria-current="page">{ d.Post.Title }</span>
+		</nav>
+		<article class="post-view">
+			<header class="post-view-header">
+				<h1 class="post-view-title">{ d.Post.Title }</h1>
+				<div class="post-view-meta">
+					<span class="post-view-author">{ d.Post.AuthorUsername }</span>
+					<span class="post-view-sep">·</span>
+					<span class="post-view-date">{ postViewDate(d.Post) }</span>
+				</div>
+				@components.CustomFields(d.Category.ExtraFields, d.Post.ExtraData)
+			</header>
+			<div class="post-view-body">
+				@templ.Raw(d.RenderedBody)
+			</div>
+			<section class="post-view-comments" aria-label="Comments">
+				<h2>Comments</h2>
+				<p class="comments-placeholder">Comments coming soon.</p>
+			</section>
+		</article>
+	}
+}

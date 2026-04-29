@@ -136,6 +136,20 @@ func PostByID(db *sql.DB, id int64) (*Post, error) {
 	return p, nil
 }
 
+// PostBySlugAll returns a post by category and slug regardless of status or soft-deletion.
+// Use this to check if a draft or deleted post exists for privileged viewers.
+func PostBySlugAll(db *sql.DB, categoryID int64, slug string) (*Post, error) {
+	row := db.QueryRow(postSelect+` WHERE p.category_id = ? AND p.slug = ?`, categoryID, slug)
+	p, err := scanPost(row)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("PostBySlugAll: %w", err)
+	}
+	return p, nil
+}
+
 // PostBySlug returns a published, non-deleted post by category and slug.
 func PostBySlug(db *sql.DB, categoryID int64, slug string) (*Post, error) {
 	row := db.QueryRow(postSelect+`
