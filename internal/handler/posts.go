@@ -120,6 +120,78 @@ func postListHandler(db *sql.DB, group string, cat *model.Category, w http.Respo
 	render.Component(w, r, templates.PostList(cats, theme, d))
 }
 
+func PostView(db *sql.DB, group string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		catSlug := chi.URLParam(r, "category")
+		slug := chi.URLParam(r, "slug")
+
+		cat, err := model.CategoryBySlugAndGroup(db, catSlug, group)
+		if err != nil {
+			log.Printf("PostView category: %v", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+		if cat == nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		post, err := model.PostBySlug(db, cat.ID, slug)
+		if err != nil {
+			log.Printf("PostView post: %v", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+
+		// Not published — check if a privileged user (curator or author) can see it.
+		if post == nil {
+			if u := model.UserFromContext(r.Context()); u != nil {
+				post, err = model.PostBySlugAll(db, cat.ID, slug)
+				if err != nil {
+					log.Printf("PostView draft lookup: %v", err)
+					http.Error(w, "internal error", http.StatusInternalServerError)
+					return
+				}
+				if post != nil && u.Role != "curator" && u.ID != post.AuthorID {
+					post = nil
+				}
+			}
+		}
+
+		if post == nil {
+			http.NotFound(w, r)
+			return
+		}
+
+		body, err := render.RenderMarkdown(post.Body)
+		if err != nil {
+			log.Printf("PostView render: %v", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+
+		cats, err := model.AllCategories(db)
+		if err != nil {
+			log.Printf("PostView categories: %v", err)
+			http.Error(w, "internal error", http.StatusInternalServerError)
+			return
+		}
+
+		theme := "dark"
+		if u := model.UserFromContext(r.Context()); u != nil && u.Theme != "" {
+			theme = u.Theme
+		}
+
+		currentPath := "/" + group + "/" + catSlug + "/" + slug
+		d := templates.PostViewData{
+			Post:         *post,
+			Category:     *cat,
+			RenderedBody: body,
+		}
+		render.Component(w, r, templates.PostView(cats, theme, currentPath, d))
+	}
+}
+
 func parsePage(r *http.Request) int {
 	// Atoi returns 0 on non-numeric input; the clamp below handles it.
 	p, _ := strconv.Atoi(r.URL.Query().Get("page"))

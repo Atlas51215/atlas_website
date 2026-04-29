@@ -1,0 +1,22 @@
+package components
+
+import "github.com/claude/blog/internal/model"
+
+templ CustomFields(fields []model.ExtraField, extraData string) {
+	if len(fieldItems(fields, extraData)) > 0 {
+		<dl class="custom-fields">
+			for _, item := range fieldItems(fields, extraData) {
+				<dt class="custom-field-label">{ item.Label }</dt>
+				<dd class="custom-field-value">
+					if item.Type == "float" {
+						@Rating(item.Value)
+					} else if item.Type == "url" {
+						<a href={ templ.SafeURL(item.Value) }>{ item.Value }</a>
+					} else {
+						{ item.Value }
+					}
+				</dd>
+			}
+		</dl>
+	}
+}

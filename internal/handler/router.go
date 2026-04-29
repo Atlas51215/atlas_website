@@ -18,10 +18,12 @@ func NewRouter(db *sql.DB, staticDir string) http.Handler {
 	r.Route("/blog", func(r chi.Router) {
 		r.Get("/", BlogLanding(db))
 		r.Get("/{category}", BlogCategory(db))
+		r.Get("/{category}/{slug}", PostView(db, "blog"))
 	})
 	r.Route("/reviews", func(r chi.Router) {
 		r.Get("/", ReviewsLanding(db))
 		r.Get("/{category}", ReviewsCategory(db))
+		r.Get("/{category}/{slug}", PostView(db, "reviews"))
 	})
 	r.Get("/register", RegisterPage(db))
 	r.Post("/register", RegisterSubmit(db))
