@@ -54,7 +54,7 @@ func TestDB_TablesExist(t *testing.T) {
 	tables := []string{
 		"categories", "users", "posts", "comments", "tags",
 		"post_tags", "follows", "notifications", "email_queue",
-		"verification_tokens", "about_pages", "schema_migrations",
+		"verification_tokens", "about_pages", "sessions", "schema_migrations",
 	}
 
 	for _, table := range tables {
