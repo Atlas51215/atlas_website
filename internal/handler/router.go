@@ -17,6 +17,9 @@ func NewRouter(db *sql.DB, staticDir string) http.Handler {
 	r.Get("/", Home(db))
 	r.Get("/register", RegisterPage(db))
 	r.Post("/register", RegisterSubmit(db))
+	r.Get("/login", LoginPage(db))
+	r.Post("/login", LoginSubmit(db))
+	r.Post("/logout", LogoutSubmit(db))
 	r.Handle("/static/*", http.StripPrefix("/static/", http.FileServer(http.Dir(staticDir))))
 	r.Handle("/favicon.ico", http.FileServer(http.Dir(staticDir)))
 	return r
