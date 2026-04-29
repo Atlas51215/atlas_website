@@ -209,6 +209,36 @@ func PostsByAuthor(db *sql.DB, authorID int64, page, pageSize int) ([]Post, int,
 	return posts, total, nil
 }
 
+// PostsByGroup returns published, non-deleted posts across all categories in a group, newest first.
+// page is 1-based. Returns the posts and the total count of matching posts.
+func PostsByGroup(db *sql.DB, groupName string, page, pageSize int) ([]Post, int, error) {
+	var total int
+	err := db.QueryRow(`
+		SELECT COUNT(*) FROM posts p
+		JOIN categories c ON c.id = p.category_id
+		WHERE c.group_name = ? AND p.status = 'published' AND p.is_deleted = 0`, groupName,
+	).Scan(&total)
+	if err != nil {
+		return nil, 0, fmt.Errorf("PostsByGroup count: %w", err)
+	}
+
+	offset := (page - 1) * pageSize
+	rows, err := db.Query(postSelect+`
+		WHERE c.group_name = ? AND p.status = 'published' AND p.is_deleted = 0
+		ORDER BY p.published_at DESC
+		LIMIT ? OFFSET ?`, groupName, pageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("PostsByGroup: %w", err)
+	}
+	defer rows.Close()
+
+	posts, err := scanPosts(rows)
+	if err != nil {
+		return nil, 0, err
+	}
+	return posts, total, nil
+}
+
 // RecentPosts returns the most recently published, non-deleted posts across all categories.
 func RecentPosts(db *sql.DB, limit int) ([]Post, error) {
 	rows, err := db.Query(postSelect+`

@@ -1,0 +1,29 @@
+package components
+
+import "strconv"
+
+type PaginationData struct {
+	CurrentPage int
+	TotalPages  int
+	BaseURL     string
+}
+
+templ Pagination(d PaginationData) {
+	if d.TotalPages > 1 {
+		<nav class="pagination" aria-label="Page navigation">
+			for i := 1; i <= d.TotalPages; i++ {
+				if i == d.CurrentPage {
+					<span class="pagination-current" aria-current="page">{ strconv.Itoa(i) }</span>
+				} else {
+					<a
+						class="pagination-link"
+						href={ templ.SafeURL(pageURL(d.BaseURL, i)) }
+						hx-get={ pageURL(d.BaseURL, i) }
+						hx-target="#post-list"
+						hx-swap="innerHTML"
+					>{ strconv.Itoa(i) }</a>
+				}
+			}
+		</nav>
+	}
+}

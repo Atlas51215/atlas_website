@@ -1,0 +1,50 @@
+package templates
+
+import (
+	"github.com/claude/blog/internal/model"
+	"github.com/claude/blog/templates/components"
+)
+
+type PostListData struct {
+	Group      string
+	Category   *model.Category
+	Posts      []model.Post
+	Page       int
+	TotalPages int
+	BaseURL    string
+}
+
+func postListTitle(d PostListData) string {
+	if d.Category != nil {
+		return d.Category.Name
+	}
+	if d.Group == "reviews" {
+		return "Reviews"
+	}
+	return "Blog"
+}
+
+templ PostListInner(d PostListData) {
+	if len(d.Posts) == 0 {
+		<p class="post-list-empty">No posts yet.</p>
+	}
+	for _, p := range d.Posts {
+		@components.PostCard(p)
+	}
+	@components.Pagination(components.PaginationData{
+		CurrentPage: d.Page,
+		TotalPages:  d.TotalPages,
+		BaseURL:     d.BaseURL,
+	})
+}
+
+templ PostList(cats []model.Category, theme string, d PostListData) {
+	@Layout(postListTitle(d), cats, d.BaseURL, theme) {
+		<div class="post-list-header">
+			<h1>{ postListTitle(d) }</h1>
+		</div>
+		<div id="post-list">
+			@PostListInner(d)
+		</div>
+	}
+}
