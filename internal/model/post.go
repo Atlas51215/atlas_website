@@ -253,6 +253,37 @@ func PostsByGroup(db *sql.DB, groupName string, page, pageSize int) ([]Post, int
 	return posts, total, nil
 }
 
+// PostsByFollowedCurators returns published, non-deleted posts by curators that followerID follows,
+// newest first. page is 1-based. Returns the posts and the total count.
+func PostsByFollowedCurators(db *sql.DB, followerID int64, page, pageSize int) ([]Post, int, error) {
+	var total int
+	err := db.QueryRow(`
+		SELECT COUNT(*) FROM posts p
+		JOIN follows f ON f.curator_id = p.author_id
+		WHERE f.follower_id = ? AND p.status = 'published' AND p.is_deleted = 0`, followerID,
+	).Scan(&total)
+	if err != nil {
+		return nil, 0, fmt.Errorf("PostsByFollowedCurators count: %w", err)
+	}
+
+	offset := (page - 1) * pageSize
+	rows, err := db.Query(postSelect+`
+		JOIN follows f ON f.curator_id = p.author_id
+		WHERE f.follower_id = ? AND p.status = 'published' AND p.is_deleted = 0
+		ORDER BY p.published_at DESC
+		LIMIT ? OFFSET ?`, followerID, pageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("PostsByFollowedCurators: %w", err)
+	}
+	defer rows.Close()
+
+	posts, err := scanPosts(rows)
+	if err != nil {
+		return nil, 0, err
+	}
+	return posts, total, nil
+}
+
 // RecentPosts returns the most recently published, non-deleted posts across all categories.
 func RecentPosts(db *sql.DB, limit int) ([]Post, error) {
 	rows, err := db.Query(postSelect+`

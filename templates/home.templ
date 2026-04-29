@@ -1,9 +1,48 @@
 package templates
 
-import "github.com/claude/blog/internal/model"
+import (
+	"github.com/claude/blog/internal/model"
+	"github.com/claude/blog/templates/components"
+)
 
-templ Home(cats []model.Category, theme string) {
+type HomeData struct {
+	Posts      []model.Post
+	Page       int
+	TotalPages int
+	HasFollows bool
+	IsLoggedIn bool
+}
+
+templ HomeInner(d HomeData) {
+	if len(d.Posts) == 0 {
+		<p class="post-list-empty">No posts yet.</p>
+	}
+	for _, p := range d.Posts {
+		@components.PostCard(p)
+	}
+	@components.Pagination(components.PaginationData{
+		CurrentPage: d.Page,
+		TotalPages:  d.TotalPages,
+		BaseURL:     "/",
+	})
+}
+
+templ Home(cats []model.Category, theme string, d HomeData) {
 	@Layout("Home", cats, "/", theme) {
-		<h1>Welcome to Atlas</h1>
+		<div class="post-list-header">
+			<h1>
+				if d.IsLoggedIn && d.HasFollows {
+					Your Feed
+				} else {
+					Recent Posts
+				}
+			</h1>
+			if d.IsLoggedIn && !d.HasFollows {
+				<p class="feed-hint">Follow curators to personalize your feed.</p>
+			}
+		</div>
+		<div id="post-list">
+			@HomeInner(d)
+		</div>
 	}
 }
