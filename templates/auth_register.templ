@@ -1,0 +1,78 @@
+package templates
+
+import "github.com/claude/blog/internal/model"
+
+type RegisterData struct {
+	Username    string
+	Email       string
+	ErrUsername string
+	ErrEmail    string
+	ErrPassword string
+	ErrConfirm  string
+}
+
+templ Register(cats []model.Category, theme string, d RegisterData) {
+	@Layout("Register", cats, "/register", theme) {
+		<div class="auth-form">
+			<h1>Create an Account</h1>
+			<form method="POST" action="/register" novalidate>
+				<div class="form-group">
+					<label for="username">Username</label>
+					<input
+						type="text"
+						id="username"
+						name="username"
+						value={ d.Username }
+						autocomplete="username"
+						required
+					/>
+					if d.ErrUsername != "" {
+						<span class="form-error">{ d.ErrUsername }</span>
+					}
+				</div>
+				<div class="form-group">
+					<label for="email">Email</label>
+					<input
+						type="email"
+						id="email"
+						name="email"
+						value={ d.Email }
+						autocomplete="email"
+						required
+					/>
+					if d.ErrEmail != "" {
+						<span class="form-error">{ d.ErrEmail }</span>
+					}
+				</div>
+				<div class="form-group">
+					<label for="password">Password</label>
+					<input
+						type="password"
+						id="password"
+						name="password"
+						autocomplete="new-password"
+						required
+					/>
+					if d.ErrPassword != "" {
+						<span class="form-error">{ d.ErrPassword }</span>
+					}
+				</div>
+				<div class="form-group">
+					<label for="confirm_password">Confirm Password</label>
+					<input
+						type="password"
+						id="confirm_password"
+						name="confirm_password"
+						autocomplete="new-password"
+						required
+					/>
+					if d.ErrConfirm != "" {
+						<span class="form-error">{ d.ErrConfirm }</span>
+					}
+				</div>
+				<button type="submit">Create Account</button>
+			</form>
+			<p>Already have an account? <a href="/login">Sign in</a></p>
+		</div>
+	}
+}
