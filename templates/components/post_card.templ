@@ -1,0 +1,23 @@
+package components
+
+import "github.com/claude/blog/internal/model"
+
+templ PostCard(p model.Post) {
+	<article class="post-card">
+		<h2 class="post-card-title">
+			<a href={ templ.SafeURL(postURL(p)) }>{ p.Title }</a>
+		</h2>
+		<div class="post-card-meta">
+			<span class="post-card-author">{ p.AuthorUsername }</span>
+			<span class="post-card-sep">·</span>
+			<span class="post-card-date">{ publishedDate(p) }</span>
+			<span class="post-card-sep">·</span>
+			<span class="post-card-category">{ p.CategoryName }</span>
+			if rating, ok := extractRating(p.ExtraData); ok {
+				<span class="post-card-sep">·</span>
+				<span class="post-card-rating">★ { rating }</span>
+			}
+		</div>
+		<p class="post-card-preview">{ bodyPreview(p.Body) }</p>
+	</article>
+}
